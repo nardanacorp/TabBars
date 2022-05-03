@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BubleTabBar">
+        <attr name="RadiusAll" format="integer"/>
+        <attr name="RadiusTopLeft" format="integer"/>
+        <attr name="RadiusTopRight" format="integer"/>
+        <attr name="RadiusBottomLeft" format="integer"/>
+        <attr name="RadiusBottomRight" format="integer"/>
+        <attr name="BoxShadowSize" format="integer"/>
+        <attr name="BoxShadowSizeX" format="integer"/>
+        <attr name="BoxShadowSizeY" format="integer"/>
+        <attr name="BoxShadowColor" format="color"/>
+        <attr name="BackgroundColor" format="color"/>
+        <attr name="BackgroundTapped" format="color"/>
+        <attr name="TitleSize" format="dimension"/>
+    </declare-styleable>
+</resources>
