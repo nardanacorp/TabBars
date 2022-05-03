@@ -29,7 +29,7 @@ dependencies {
 ```
 # Usage
 
-# FLatTabBar
+# FlatTabBar
 
 Follow instruction [FlatTabBar](https://github.com/nardanacorp/FlatTabBar)
 
