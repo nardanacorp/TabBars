@@ -31,11 +31,11 @@ dependencies {
 
 # FLatTabBar
 
-Follow instruction [FlatTabBar](https://github.com/nardana/FlatTabBar)
+Follow instruction [FlatTabBar](https://github.com/nardanacorp/FlatTabBar)
 
 # BubleTabBar
 
-Follow instruction [BubleTabBar](https://github.com/nardana/BubleTabBar)
+Follow instruction [BubleTabBar](https://github.com/nardanacorp/BubleTabBar)
 
 # Contact Us
 
