@@ -32,9 +32,13 @@ dependencies {
 
 # FlatTabBar
 
+![FlatTabBar](https://user-images.githubusercontent.com/102223749/166692213-17f83fcd-d7c7-41fa-a3e1-3b9edeb75a6a.png)
+
 Follow instruction in [FlatTabBar](https://github.com/nardanacorp/FlatTabBar)
 
 # BubleTabBar
+
+![BubleTabBar](https://user-images.githubusercontent.com/102223749/166692232-a3957a94-c02a-4b3f-8dae-14289ccd4302.png)
 
 Follow instruction in [BubleTabBar](https://github.com/nardanacorp/BubleTabBar)
 
