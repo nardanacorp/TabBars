@@ -1,5 +1,6 @@
 package ir.nardana.bubletabbar
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -8,27 +9,29 @@ import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 
 class BubleTabBar: RelativeLayout {
-    var backgrounduncolor: Int = -1
-    var backgroundtapped: Int = -1
-    var radiusall: Int = -1
-    var cornerradiusTopLeft: Int = -1
-    var cornerradiusTopRight: Int = -1
-    var cornerradiusBottomLeft: Int = -1
-    var cornerradiusBottomRight: Int = -1
-    var layoutwidth: Int = -1
-    var layoutheight: Int = -1
-    var boxshadowsize: Int = -1
-    var boxshadowsizex: Int = 0
-    var boxshadowsizey: Int = 0
-    var boxshadowcolor: Int = -1
-    var titlesize: Float = 0f
-    var numcolumns: Int = 0
-    var typeface: Typeface? = null
-    var backgroundPaint = Paint()
-    var backgroundtappedPaint = Paint()
-    var textpaint = Paint()
-    var listcontainernums: MutableList<ContainerNums> = mutableListOf()
-    var indextapped: Int = 0
+    private var backgrounduncolor: Int = -1
+    private var backgroundtapped: Int = -1
+    private var colortitletapped: Int = -1
+    private var radiusall: Int = -1
+    private var cornerradiusTopLeft: Int = -1
+    private var cornerradiusTopRight: Int = -1
+    private var cornerradiusBottomLeft: Int = -1
+    private var cornerradiusBottomRight: Int = -1
+    private var layoutwidth: Int = -1
+    private var layoutheight: Int = -1
+    private var boxshadowsize: Int = -1
+    private var boxshadowsizex: Int = 0
+    private var boxshadowsizey: Int = 0
+    private var boxshadowcolor: Int = -1
+    private var titlesize: Float = 0f
+    private var numcolumns: Int = 0
+    private var typeface: Typeface? = null
+    private var backgroundPaint = Paint()
+    private var backgroundtappedPaint = Paint()
+    private var textpaint = Paint()
+    private var listcontainernums: MutableList<ContainerNums> = mutableListOf()
+    private var indextapped: Int = 0
+    private var status_setlist = false
 
     lateinit var listener: OnSelectedItem
 
@@ -65,10 +68,18 @@ class BubleTabBar: RelativeLayout {
                 this.backgrounduncolor)
             this.backgroundtapped = ta.getColor(R.styleable.BubleTabBar_BackgroundTapped,
                 ContextCompat.getColor(this.context,R.color.white))
+            this.colortitletapped = ta.getColor(R.styleable.BubleTabBar_ColorTitleTapped, 0)
         }finally {
             ta.recycle()
         }
         setWillNotDraw(false)
+        if(!this.status_setlist) initlist()
+    }
+
+    private fun initlist()
+    {
+        val mutablelist = mutableListOf<String>("First","Second")
+        this.setListTabBar(mutablelist)
     }
 
     private fun clearselected()
@@ -105,11 +116,15 @@ class BubleTabBar: RelativeLayout {
         this.backgroundPaint.style = Paint.Style.FILL_AND_STROKE
         this.backgroundPaint.color = this.backgrounduncolor
         this.backgroundPaint.strokeWidth = (2 * resources.displayMetrics.density)
+        val totalpaddingleft = if(paddingLeft.toFloat() == 0f) 5f else paddingLeft.toFloat()
+        val totalpaddingright = if(paddingRight.toFloat() == 0f) 5f else paddingRight.toFloat()
+        val totalpaddingtop = if(paddingTop.toFloat() == 0f) 5f else paddingTop.toFloat()
+        val totalpaddingbottom = if(paddingBottom.toFloat() == 0f) 5f else paddingBottom.toFloat()
         if(this.boxshadowsize > -1)
         {
             this.backgroundPaint.setShadowLayer((this.boxshadowsize * resources.displayMetrics.density),this.boxshadowsizex.toFloat(),this.boxshadowsizey.toFloat(),this.boxshadowcolor)
         }
-        val rectfbackground = RectF(0f,0f,this.layoutwidth.toFloat(),this.layoutheight.toFloat())
+        val rectfbackground = RectF(totalpaddingleft,totalpaddingtop,this.layoutwidth.toFloat() - totalpaddingright,this.layoutheight.toFloat() - totalpaddingbottom)
         val corners: FloatArray
         if(this.radiusall > 0)
         {
@@ -149,7 +164,7 @@ class BubleTabBar: RelativeLayout {
                     val paintbackgroundselected = Paint()
                     paintbackgroundselected.style = Paint.Style.FILL
                     paintbackgroundselected.color = this.backgroundtapped
-                    val rectselecteditem = RectF(it.startwidth + 5f,5f,it.endwidth - 5f,it.height - 5f)
+                    val rectselecteditem = RectF(it.startwidth + totalpaddingleft,totalpaddingtop,it.endwidth - totalpaddingright,it.height - totalpaddingbottom)
                     val corners: FloatArray
                     if(this.radiusall > 0)
                     {
@@ -165,13 +180,18 @@ class BubleTabBar: RelativeLayout {
                 }
                 if(this.typeface != null) this.textpaint.setTypeface(this.typeface)
                 this.textpaint.textSize = this.titlesize
-                this.textpaint.color = if(it.selected) this.backgrounduncolor else this.backgroundtapped
+                this.textpaint.color = if(it.selected) if(this.colortitletapped == 0) this.backgrounduncolor else this.colortitletapped else this.backgroundtapped
                 this.textpaint.textAlign = Paint.Align.CENTER
                 val positionx = (((it.endwidth - it.startwidth) / 2) + it.startwidth)
                 val positiony = (it.height / 2) - ((textpaint.descent() + textpaint.ascent()) / 2)
                 canvas!!.drawText(it.title,positionx,positiony,this.textpaint)
             }
         }
+    }
+
+    fun getColorTitleTapped(): Int
+    {
+        return this.colortitletapped
     }
 
     fun getBackgroundUnColor(): Int
@@ -338,12 +358,14 @@ class BubleTabBar: RelativeLayout {
 
     fun setListTabBar(value: MutableList<String>)
     {
+        this.listcontainernums.removeAll(this.listcontainernums)
         this.numcolumns = value.size
         value.forEach{
             var temps = ContainerNums()
             temps.title = it
             this.listcontainernums.add(temps)
         }
+        this.status_setlist = true
         if(this.numcolumns > 0) this.listcontainernums.get(0).selected = true
         refresh()
     }
@@ -375,6 +397,12 @@ class BubleTabBar: RelativeLayout {
     fun setBackgroundTapped(value: Int)
     {
         this.backgroundtapped = value
+        refresh()
+    }
+
+    fun setColorTitleTapped(value: Int)
+    {
+        this.colortitletapped = value
         refresh()
     }
 

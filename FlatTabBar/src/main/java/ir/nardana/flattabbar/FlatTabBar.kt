@@ -35,6 +35,7 @@ class FlatTabBar: RelativeLayout {
     var listcontainernums: MutableList<ContainerNums> = mutableListOf()
     var indextapped: Int = 0
     lateinit var listener: OnSelectedItem
+    private var status_setlist = false
 
     constructor(context: Context?) : super(context){
         this.listcontainernums = mutableListOf()
@@ -63,15 +64,13 @@ class FlatTabBar: RelativeLayout {
             this.boxshadowsize = ta.getInteger(R.styleable.FlatTabBar_BoxShadowSize,-1)
             this.boxshadowsizex = ta.getInteger(R.styleable.FlatTabBar_BoxShadowSizeX,0)
             this.boxshadowsizey = ta.getInteger(R.styleable.FlatTabBar_BoxShadowSizeY,0)
-            this.numcolumns = ta.getInteger(R.styleable.FlatTabBar_NumColumns,0)
             this.strokesize = ta.getDimension(R.styleable.FlatTabBar_StrokeSize,(2 * resources.displayMetrics.density))
             this.titlesize = ta.getDimension(R.styleable.FlatTabBar_TitleSize,(18 * resources.displayMetrics.density))
             this.colorstroke = ta.getColor(R.styleable.FlatTabBar_ColorStroke,
                 ContextCompat.getColor(context,R.color.teal_200))
             this.boxshadowcolor = ta.getColor(R.styleable.FlatTabBar_BoxShadowColor,
                 this.colorstroke)
-            this.colortitletapped = ta.getColor(R.styleable.FlatTabBar_ColorTitleTapped,
-                ContextCompat.getColor(context,R.color.teal_200))
+            this.colortitletapped = ta.getColor(R.styleable.FlatTabBar_ColorTitleTapped,0)
             this.backgroundpretapped = ta.getColor(R.styleable.FlatTabBar_BackgroundPreTapped,
                 ContextCompat.getColor(context,R.color.teal_200))
             this.backgroundaftertapped = ta.getColor(R.styleable.FlatTabBar_BackgroundAfterTapped,
@@ -80,6 +79,13 @@ class FlatTabBar: RelativeLayout {
             ta.recycle()
         }
         setWillNotDraw(false)
+        if(!this.status_setlist) initlist()
+    }
+
+    private fun initlist()
+    {
+        val mutablelist = mutableListOf<String>("First","Second")
+        this.setListTabBar(mutablelist)
     }
 
     private fun clearselected()
@@ -116,11 +122,15 @@ class FlatTabBar: RelativeLayout {
         this.backgroundPaint.style = Paint.Style.STROKE
         this.backgroundPaint.color = this.colorstroke
         this.backgroundPaint.strokeWidth = this.strokesize
+        val totalpaddingleft = if(paddingLeft.toFloat() == 0f) 5f else paddingLeft.toFloat()
+        val totalpaddingright = if(paddingRight.toFloat() == 0f) 5f else paddingRight.toFloat()
+        val totalpaddingtop = if(paddingTop.toFloat() == 0f) 5f else paddingTop.toFloat()
+        val totalpaddingbottom = if(paddingBottom.toFloat() == 0f) 5f else paddingBottom.toFloat()
         if(this.boxshadowsize > -1)
         {
             this.backgroundPaint.setShadowLayer((this.boxshadowsize * resources.displayMetrics.density),this.boxshadowsizex.toFloat(),this.boxshadowsizey.toFloat(),this.boxshadowcolor)
         }
-        val rectfbackground = RectF(0f,0f,this.layoutwidth.toFloat(),this.layoutheight.toFloat())
+        val rectfbackground = RectF(totalpaddingleft,totalpaddingtop,this.layoutwidth.toFloat() - totalpaddingright,this.layoutheight.toFloat() - totalpaddingbottom)
         val corners: FloatArray
         if(this.radiusall > 0)
         {
@@ -160,7 +170,7 @@ class FlatTabBar: RelativeLayout {
                     val paintbackgroundselected = Paint()
                     paintbackgroundselected.style = Paint.Style.FILL
                     paintbackgroundselected.color = this.backgroundaftertapped
-                    val rectselecteditem = RectF(it.startwidth,0f,it.endwidth,it.height)
+                    val rectselecteditem = RectF(it.startwidth + totalpaddingleft,totalpaddingtop,it.endwidth - totalpaddingright,it.height - totalpaddingbottom)
                     val corners: FloatArray
                     if(w == 0)
                     {
@@ -190,7 +200,7 @@ class FlatTabBar: RelativeLayout {
                 }
                 if(this.typeface != null) this.textpaint.setTypeface(this.typeface)
                 this.textpaint.textSize = this.titlesize
-                this.textpaint.color = if(it.selected) ContextCompat.getColor(this.context,R.color.white) else this.colorstroke
+                this.textpaint.color = if(it.selected) if(this.colortitletapped == 0) ContextCompat.getColor(this.context,R.color.white) else this.colortitletapped else this.colorstroke
                 this.textpaint.textAlign = Paint.Align.CENTER
                 val positionx = (((it.endwidth - it.startwidth) / 2) + it.startwidth)
                 val positiony = (it.height / 2) - ((textpaint.descent() + textpaint.ascent()) / 2)
@@ -390,12 +400,14 @@ class FlatTabBar: RelativeLayout {
 
     fun setListTabBar(value: MutableList<String>)
     {
+        this.listcontainernums.removeAll(this.listcontainernums)
         this.numcolumns = value.size
         value.forEach{
             var temps = ContainerNums()
             temps.title = it
             this.listcontainernums.add(temps)
         }
+        this.status_setlist = true
         if(this.numcolumns > 0) this.listcontainernums.get(0).selected = true
         refresh()
     }

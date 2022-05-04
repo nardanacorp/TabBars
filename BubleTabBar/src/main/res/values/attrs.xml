@@ -12,6 +12,7 @@
         <attr name="BoxShadowColor" format="color"/>
         <attr name="BackgroundColor" format="color"/>
         <attr name="BackgroundTapped" format="color"/>
+        <attr name="ColorTitleTapped" format="color"/>
         <attr name="TitleSize" format="dimension"/>
     </declare-styleable>
 </resources>
